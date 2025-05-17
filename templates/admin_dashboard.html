@@ -1,1 +1,103 @@
 {% extends "base.html" %}
+
+{% block title %} Admin Dashboard {% endblock %}
+
+{% block style %}
+<style>
+    body {
+        background-image: none !important;
+    }
+
+    .card {
+        margin: 10px;
+        background-color: aliceblue;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.160);
+    }
+
+    .spot_box {
+        width: 50px;
+        height: 50px;
+        background-color: red;
+        border-radius: 25%;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .available {
+        background-color: rgb(255, 167, 167);
+    }
+
+    .unavailable {
+        background-color: rgb(0, 170, 9);
+    }
+</style>
+{% endblock %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm sticky-top">
+    <div class="container-fluid">
+        <a href="{{url_for('admin_dashboard')}}" class="navbar-brand mx-5"><strong>ParC</strong></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a href="{{url_for('admin_dashboard')}}" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{url_for('get_users_data')}}" class="nav-link">Users</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item mx-3">
+                    <a href="{{url_for('user_logout')}}" class="nav-link">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5 shadow-sm p-4 rounded bg-white">
+    <div class="row mb-4">
+        <div class="col text-center py-3 rounded border shadow-sm" style="background-color: floralwhite;">
+            <h5 class="fw-semibold mb-0">Available Parking Lots</h5>
+        </div>
+    </div>
+    <div class="row align-items-start justify-content-center gap-3">
+        {% for lot in lots %}
+        <div class="card border-0" style="width: 15rem;">
+            <a href="{{url_for('view_parking_lot', lot_id = lot.id)}}" class="text-decoration-none text-dark">
+                <div class="card-body">
+                    <h5 class="text-center fw-semibold">{{lot.pl_name}}</h5>
+                    <hr>
+                    <p class="card-text mb-1"><strong>Price/hr: </strong> ₹{{lot.price}}</p>
+                    <p class="card-text mb-1"><strong>Address: </strong> {{lot.address}}</p>
+                    <p class="card-text mb-1"><strong>Pincode: </strong> {{lot.pincode}} </p>
+                    <p class="card-text mb-1"><strong>Capacity: </strong> {{lot.capacity}} </p>
+                    <p class="card-text"><strong>Current spot count: </strong> {{lot.spots_count}} </p>
+                </div>
+            </a>
+        </div>
+        {% else %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No Parking Lots Available</p>
+        </div>
+        {% endfor %}
+        <div class="row mt-5">
+            <div class="col text-center">
+                <a href="{{url_for('create_lot')}}" class="btn btn-primary px-4 py-2">+ Add Lot</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

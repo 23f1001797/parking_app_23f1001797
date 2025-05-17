@@ -1,0 +1,40 @@
+{% extends "admin_dashboard.html" %}
+
+{% block title %} View Lot {% endblock %}
+
+{% block content %}
+<div class="container my-5 w-50 mx-auto bg-light p-4 rounded shadow">
+    <div class="row justify-content-center mb-4">
+        <div class="text-center">
+            <h4 class="fw-semibold">Parking Lot: {{lot.pl_name}} </h4>
+            <hr>
+            <div>
+                <span class="fw-semibold text-danger">Available spots: {{available_spots}} </span> |
+                <span class="fw-semibold text-success">Occupied spots: {{occupied_spots}} </span>
+            </div>
+        </div>
+    </div>
+    <div class="row align-items-start justify-content-center gap-3 rounded p-3 bg-light shadow border">
+        {% for spot in lot.spots %}
+        <a href="{{url_for('get_spot', spot_id = spot.id)}}"
+            class="spot_box shadow-sm {{'unavailable' if spot.status != 'available' else 'available'}} ">
+            {{spot.id}}
+        </a>
+        {% else %}
+        <div class="text-center">
+            <h5 class="text-muted">No Spots Found</h5>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center my-5">
+        <a href="{{url_for('create_spot', lot_id = lot.id)}}" class="btn btn-primary"> Add Spot</a>
+    </div>
+    <div class="d-flex justify-content-between">
+        <div class="d-flex">
+            <a href="{{url_for('edit_parking_lot', lot_id=lot.id)}}" class="btn btn-info mx-2">Edit Lot</a>
+            <a href="{{url_for('delete_lot', lot_id = lot.id)}}" class="btn btn-danger">Delete Lot</a>
+        </div>
+        <a href="{{url_for('admin_dashboard')}}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</div>
+{% endblock %}

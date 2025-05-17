@@ -1,0 +1,59 @@
+{% extends "admin_dashboard.html" %}
+
+{% block title %}Parking Spot Details {% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        {% if reservation %}
+        <div class="col-md-6 bg-light border rounded p-4 shadow-sm mt-5 mx-auto">
+            <h4 class="text-center">Parking Spot Details</h4>
+            <div class="mb-3">
+                <label class="form-label">Spot ID</label>
+                <input type="text" class="form-control" value="{{reservation.spot_id}}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Customer ID:</label>
+                <input type="text" class="form-control" value="{{reservation.user_id}}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Vehicle Registration Number:</label>
+                <input type="text" class="form-control" value="{{reservation.vrn}}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Parking Date</label>
+                <input type="text" class="form-control" value="{{reservation.parking_timestamp.strftime('%Y-%m-%d')}}"
+                    readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Parking Timestamp</label>
+                <input type="text" class="form-control" value="{{reservation.parking_timestamp.strftime('%H : %M')}}"
+                    readonly>
+            </div>
+            <div class="text-center">
+                <a href="{{url_for('admin_dashboard')}}" class="btn btn-outline-secondary">Close</a>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="container my-5">
+            <div class="mx-auto p-4 border rounded shadow-sm bg-light" style="max-width: 360px;">
+                <h5 class="text-center mb-4">Parking Spot Details</h5>
+                <div class="mb-3">
+                    <label class="form-label">Spot ID</label>
+                    <input type="text" class="form-control text-center" value="{{spot.id}}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <input type="text" class="form-control text-center" value="{{spot.status}}" readonly>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a href="{{url_for('delete_spot', spot_id=spot.id)}}" class="btn btn-danger">Delete</a>
+                    <a href="{{url_for('admin_dashboard')}}" class="btn btn-outline-secondary">Close</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
