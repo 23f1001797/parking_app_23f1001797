@@ -6,7 +6,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String, unique = True, nullable = False)
     username = db.Column(db.String, unique = True, nullable = False)
     password = db.Column(db.String, nullable = False)
-    fs_uniquifier = db.Column(db.String, uniqui= True, nullabe = False)
+    fs_uniquifier = db.Column(db.String, unique= True, nullable = False)
     active = db.Column(db.Boolean, default = True)
     roles = db.relationship('Role', secondary = 'user_roles', backref = 'bearer')
     reservations = db.relationship('Reservation', backref = 'bearer')
@@ -22,14 +22,14 @@ class UserRoles(db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable = False)
 
 class ParkingLot(db.Model):
-    id = db.column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key = True)
     pl_name = db.Column(db.String, nullable = False)
     price = db.Column(db.Integer, nullable = False, default = 1000)
     address = db.Column(db.String, nullable = False)
     pincode = db.Column(db.Integer, nullable = False)
     capacity = db.Column(db.Integer, nullable = False)
     spots_count = db.Column(db.Integer, nullable = False)
-    created_at = db.Column(db.DateTime, nullabe = False)
+    created_at = db.Column(db.DateTime, nullable = False)
     spots = db.relationship('ParkingSpot', backref = 'lot', cascade = 'all, delete')
 
 class ParkingSpot(db.Model):
@@ -40,7 +40,7 @@ class ParkingSpot(db.Model):
 
 class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    spot_id = db.Column(db.Integer, db.ForeignKey('parking_spot.id'), nullabe=False)
+    spot_id = db.Column(db.Integer, db.ForeignKey('parking_spot.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     vrn = db.Column(db.String, nullable = False)
     parking_timestamp = db.Column(db.DateTime, nullable = False)
