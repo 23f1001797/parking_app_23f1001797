@@ -76,6 +76,8 @@ def user_login():
 ####################################################################################
 
 @app.route('/admin/dashboard')
+@auth_required()
+@roles_required('admin')
 def admin_dashboard():
     lots = ParkingLot.query.all()
     return render_template('admin_dashboard.html', lots=lots)
@@ -89,6 +91,8 @@ def admin_dashboard():
 #####################################################################################
 
 @app.route('/user/dashboard')
+@auth_required()
+@roles_required('user')
 def user_dashboard():
     user = current_user
     reservations = Reservation.query.filter_by(user_id = user.id).all()
