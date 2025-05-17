@@ -1,0 +1,46 @@
+{% extends "user_dashboard.html" %}
+
+{% block title %} Spot Booking {% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 bg-light p-4 rounded shadow-sm">
+            <h4 class="text-center fw-bold mb-4">Book The Parking Spot</h4>
+            <form action="{{url_for('reserve_spot', spot_id=spot.id)}}" method="post">
+                <div class="mb-3">
+                    <label for="spot_id" class="form-label fw-semibold">Spot ID</label>
+                    <input type="text" class="form-control" id="spot_id" name="spot_id" value="{{spot.id}}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="lot_id" class="form-label fw-semibold">Lot Id</label>
+                    <input type="text" class="form-control" id="lot_id" name="lot_id" value="{{spot.lot_id}}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="pl_name" class="form-label fw-semibold">Prime Location Name</label>
+                    <input type="text" class="form-control" id="pl_name" name="pl_name" value="{{spot.lot.pl_name}}"
+                        readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label fw-semibold">Address</label>
+                    <input type="text" class="form-control" id="address" name="address" value="{{spot.lot.address}}"
+                        readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="user_id" class="form-label fw-semibold">User ID</label>
+                    <input type="text" class="form-control" id="user_id" name="user_id" value="{{user.id}}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="vrn" class="form-label fw-semibold">Vehicle No.</label>
+                    <input type="text" class="form-control" id="vrn" name="vrn"
+                        placeholder="enter your vehivle registration number here ..." required>
+                </div>
+                <div class="mt-4 d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success">Reserve</button>
+                    <a href="{{url_for('user_dashboard')}}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

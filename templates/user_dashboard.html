@@ -1,1 +1,162 @@
 {% extends "base.html" %}
+
+{% block title %}User Dashboard {% endblock %}
+
+{% block style %}
+<style>
+    body {
+        background-image: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm sticky-top">
+    <div class="container-fluid">
+        <a href="{{url_for('user_dashboard')}}" class="navbar-brand mx-5"><strong>ParC</strong></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a href="{{url_for('user_dashboard')}}" class="nav-link">Home</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a href="{{url_for('user_logout')}}" class="nav-link">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-3">
+    <div class="p-4 bg-light shadow-sm my-4">
+        <div class="container">
+            <div class="row align-items-center text-center">
+                <div class="col-md-4 mb-3 mb-md-0 text-md-end">
+                    <h6 class="mb-0">Search parking location/pincode:</h6>
+                </div>
+                <div class="col-md-8">
+                    <form action="{{url_for('user_search')}}" class="d-flex" method="post">
+                        <input type="search" class="form-control me-2" name="search_query" placeholder="Search ... "
+                            aria-label="Search">
+                        <button type="submit" class="btn btn-success">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        {% if search_query %}
+        <div class="container my-5 p-4 bg-light rounded shadow-sm border">
+            <h5 class="text-center fw-semibold mb-4">Parking Lots Found @ {{search_query}}</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped align-middle text-center">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>ID</th>
+                            <th>Prime Location Name</th>
+                            <th>Address</th>
+                            <th>Pincode</th>
+                            <th>Available</th>
+                            <th>Price/hr</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    {% if parkingLots %}
+                    <tbody>
+                        {% for l in parkingLots %}
+                        <tr>
+                            <td>{{l.lot_id}}</td>
+                            <td>{{l.pl_name}}</td>
+                            <td>{{l.address}}</td>
+                            <td>{{l.pincode}}</td>
+                            <td>{{l.availability}}</td>
+                            <td> ₹{{l.price}}</td>
+                            <td>
+                                <a href="{{url_for('book_spot', lot_id=l.lot_id)}}" class="btn btn-sm btn-info">Book</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                    <tbody>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No Lots Found</td>
+                        </tr>
+                    </tbody>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center my-5">
+            <p class="fw-bold fst-italic fs-6 text-muted">Please search to get Lot details @ location you want to park.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div class="row my-5">
+    <div class="text-center rounded mb-5 p-4 shadow-sm bg-light">
+        <h5 class="fw-bold">Recent Parking History</h5>
+    </div>
+    <div>
+        {% if reservations %}
+        <div class="container my-2 p-4 bg-light rounded shadow-sm border">
+            <table class="table table-bordered table-hover table-striped align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Lot ID</th>
+                        <th>Spot ID</th>
+                        <th>Location</th>
+                        <th>Vehicle No.</th>
+                        <th>Parking Timestamp</th>
+                        <th>Leaving Timestamp</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservations %}
+                    <tr>
+                        <td>{{r.id}}</td>
+                        <td>{{r.spot.lot_id}}</td>
+                        <td>{{r.spot_id}}</td>
+                        <td>{{r.spot.lot.address}}</td>
+                        <td>{{r.vrn}}</td>
+                        <td>{{r.parking_timestamp.strftime('%Y-%m-%d | %H : %M')}}</td>
+                        <td>
+                            {% if r.leaving_timestamp %}
+                            {{r.leaving_timestamp.strftime('%Y-%m-%d | %H : %M')}}
+                            {% else %}
+                            not released yet
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if r.status == 'unpaid' %}
+                            <a href="{{url_for('get_reservation', reserve_id=r.id)}}"
+                                class="btn btn-sm btn-success">Release</a>
+                            {% else %}
+                            Released
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center my-5">
+            <p class="fw-bold fst-italic fs-6 text-muted">No Parking History Found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

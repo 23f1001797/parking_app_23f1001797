@@ -242,3 +242,111 @@ def user_dashboard():
     user = current_user
     reservations = Reservation.query.filter_by(user_id = user.id).all()
     return render_template('user_dashboard.html', reservations=reservations)
+
+@app.route('/user/search', methods=['GET', 'POST'])
+@auth_required()
+@roles_required('user')
+def user_search():
+    user = current_user
+    reservations = Reservation.query.filter_by(user_id=user.id).all()
+    search_query = request.form.get('search_query')
+    if not search_query:
+        flash('please enter a search query', 'danger')
+        redirect(url_for('user_search'))
+    
+    results = ParkingLot.query.filter(
+        db.or_(
+            ParkingLot.pl_name.ilike(f"%{search_query}%"),
+            ParkingLot.address.ilike(f"%{search_query}%"),
+            db.cast(ParkingLot.id, db.String).ilike(f"{search_query}"),
+            db.cast(ParkingLot.price, db.String).ilike(f"{search_query}"),
+            db.cast(ParkingLot.pincode, db.String).ilike(f"{search_query}"),
+        )
+    ).all()
+    if results:
+        results = [{"lot_id": r.id, "pl_name": r.pl_name, "address": r.address, "price": r.price, "pincode": r.pincode, "availability": r.spots_count - get_reserved_spots_count(r.id)} for r in results]
+
+    return render_template('user_dashboard.html', parkingLots=results, search_query=search_query, reservations=reservations)
+
+
+@app.route('/user/book_spot/<int:lot_id>')
+@auth_required()
+@roles_required('user')
+def book_spot(lot_id):
+    user = current_user
+    spot = ParkingSpot.query.filter_by(lot_id = lot_id, status="available").first()
+    if not spot:
+        flash("no available parking spots found", "danger")
+        return redirect(url_for('user_dashboard'))
+    return render_template('book_spot.html', spot=spot, user=user)
+
+@app.route('/user/reserve_spot/<int:spot_id>', methods=['GET', 'POST'])
+@auth_required()
+@roles_required('user')
+def reserve_spot(spot_id):
+    user = current_user
+    spot = ParkingSpot.query.get(spot_id)
+    if spot.status != 'available':
+        flash('parking spot is not available', 'danger')
+        return redirect(url_for('user_dashboard'))
+    
+    vrn = request.form.get('vrn')
+    if not vrn:
+        flash('please enter you vehicle registration number', 'danger')
+        return redirect(url_for('book_spot', lot_id=spot.lot_id))
+    
+    reservation = Reservation(
+        user_id = user.id,
+        spot_id = spot.id,
+        vrn = vrn,
+        parking_timestamp = datetime.now()
+    )
+    db.session.add(reservation)
+    spot.status = "occupied"
+    db.session.commit()
+    flash('parking spot reserved successfully', 'success')
+    return redirect(url_for('user_dashboard'))
+
+@app.route('/user/reserved_spot/<int:reserve_id>')
+@auth_required()
+@roles_required('user')
+def get_reservation(reserve_id):
+    user = current_user
+    reservation = Reservation.query.get(reserve_id)
+    if reservation:
+        duration = get_duration(reservation.parking_timestamp)
+        result = {
+            "id": reservation.id,
+            "spot_id": reservation.spot_id,
+            "lot_id": reservation.spot.lot_id,
+            "pl_name": reservation.spot.lot.pl_name,
+            "user_id": reservation.user_id,
+            "vrn": reservation.vrn,
+            "parking_timestamp": reservation.parking_timestamp,
+            "leaving_timestamp": datetime.now(),
+            "duration_min": duration['duration_min'],
+            "duration_hr": duration['duration_hr'],
+            "status": reservation.status,
+            "price": reservation.spot.lot.price,
+            "total_cost": (reservation.spot.lot.price * duration['duration_in_hr'])
+        }
+    return render_template('release_spot.html', user=user, reservation=result)
+
+@app.route('/user/release_spot/<int:reserve_id>')
+@auth_required()
+@roles_required('user')
+def release_spot(reserve_id):
+    reservation = Reservation.query.get(reserve_id)
+    if reservation:
+        duration = get_duration(reservation.parking_timestamp)
+        reservation.spot.status = 'available'
+        reservation.status = 'paid'
+        reservation.duration = duration['duration_in_min']
+        reservation.leaving_timestamp = datetime.now()
+        reservation.parking_cost = int(reservation.spot.lot.price * duration['duration_in_hr'])
+        db.session.commit()
+        flash('parking spot released successfully', "success")
+        return redirect(url_for('user_dashboard'))
+    else:
+        flash('reservation not found', 'danger')
+        return redirect(url_for('user_dashboard'))
