@@ -8,7 +8,7 @@
 3 - Milestone-VP Auth-RBAC ✅
 4 - Milestone-VP Admin-Dashboard-Management ✅
 5 - Milestone-VP User-Dashboard-Management ✅
-6 - Milestone-VP Summary-Users-Admin
+6 - Milestone-VP Summary-Users-Admin ✅
 7 - Milestone-VP Cost-Calculation
 
 ### recommended

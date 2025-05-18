@@ -1,0 +1,155 @@
+{% extends "admin_dashboard.html" %}
+
+{% block title %} Admin Summary {% endblock %}
+
+{% block content %}
+<div class="container p-5">
+    <div class="rounded border my-5 p-4 bg-light shadow-sm mb-5">
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 col-md-10 col-ms-12">
+                <h5 class="text-center mb-4">Revenue from Parking Lots</h5>
+                <div class="bg-light p-3 rounded shadow-sm">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-dard">
+                            <tr>
+                                <th>Lot ID</th>
+                                <th>Prime Location Name</th>
+                                <th>Total Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lot in revenue %}
+                            <tr>
+                                <td>{{lot.lot_id}}</td>
+                                <td>{{lot.pl_name}}</td>
+                                <td>{{lot.total_revenue}}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center">No Revenue Data Available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-sm-12 text-center">
+                <h5 class="mb-4">Revenue Distribution</h5>
+                <div class="bg-light p-3 rounded shadow-sm">
+                    <canvas id="revenueChart"
+                        style="max-width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-5 p-4 border rounded shadow-sm bg-light">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-sm-12 text-center">
+                <h5 class="mb-4">Available V/S Occupied Parking Spots in Lots</h5>
+                <div class="bg-light p-3 rounded shadow-sm">
+                    <canvas id="availabilityChart" style="max-width: 100%; height: auto;">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const revenue_data = JSON.parse('{{ revenue | tojson | safe }}') || [];
+    const revenue_labels = revenue_data.map(item => item.pl_name || "Unknown");
+    const revenues = revenue_data.map(item => item.total_revenue || 0);
+
+    if (revenue_labels.length > 0) {
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'pie',
+            data: {
+                labels: revenue_labels,
+                datasets: [{
+                    label: "Revenue From Each Parking Lot",
+                    data: revenues,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 132, 1)',
+                        'rgba(255, 99, 132,  1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right' },
+                    tooltip: {
+                        callbacks: {
+                            label: tooltipItem => `Revenue: ${tooltipItem.raw}`
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        document.getElementById('revenueChart').parentNode.innerHTML = "<p class='text-center'> No Revenue data available. </p>";
+    }
+
+    const lot_availability_data = JSON.parse('{{lot_availability | tojson | safe }}') || [];
+    const available_labels = lot_availability_data.map(item => item.pl_name || "Unknown");
+    const availableSpots = lot_availability_data.map(item => item.available_spots || 0);
+    const occupiedSpots = lot_availability_data.map(item => item.occupied_spots || 0);
+
+    if (available_labels.length > 0) {
+        new Chart(document.getElementById('availabilityChart'), {
+            type: 'bar',
+            data: {
+                labels: available_labels,
+                datasets: [{
+                    label: 'Available',
+                    data: availableSpots,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                },
+                {
+                    label: 'Occupied',
+                    data: occupiedSpots,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: tooltipItem => `${tooltipItem.datasets.label}: ${tooltipItem.raw}`
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        document.getElementById('availabilityChart').parentNode.innerHTML = "<p class='text-center'> No Availability data available </p>";
+    }
+</script>
+{% endblock %}

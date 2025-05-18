@@ -88,6 +88,35 @@ def admin_dashboard():
     lots = ParkingLot.query.all()
     return render_template('admin_dashboard.html', lots=lots)
 
+@app.route('/admin/summary')
+@auth_required()
+@roles_required('admin')
+def admin_summary():
+    revenue = db.session.query(
+        ParkingLot.id,
+        ParkingLot.pl_name,
+        func.sum(Reservation.parking_cost).label('total_revenue')
+    ).join(ParkingSpot, ParkingLot.id == ParkingSpot.lot_id
+    ).join(Reservation, ParkingSpot.id == Reservation.spot_id
+    ).group_by(ParkingLot.id, ParkingLot.pl_name).all()
+
+    if revenue:
+        revenue = [{"lot_id": r.id, "pl_name": r.pl_name, "total_revenue": r.total_revenue} for r in revenue]
+
+    parking_lots = ParkingLot.query.all()
+    lot_availability = []
+    for lot in parking_lots:
+        total_spots = lot.spots_count
+        occupied_spots = get_reserved_spots_count(lot.id)
+        available_spots = total_spots - occupied_spots
+        lot_availability.append({
+            "pl_name": lot.pl_name,
+            "available_spots": available_spots,
+            "occupied_spots": occupied_spots,
+            "total_spots": total_spots
+        })
+    return render_template('admin_summary.html', revenue=revenue, lot_availability=lot_availability)
+
 @app.route('/admin/users')
 @auth_required()
 @roles_required('admin')
@@ -267,6 +296,30 @@ def user_search():
         results = [{"lot_id": r.id, "pl_name": r.pl_name, "address": r.address, "price": r.price, "pincode": r.pincode, "availability": r.spots_count - get_reserved_spots_count(r.id)} for r in results]
 
     return render_template('user_dashboard.html', parkingLots=results, search_query=search_query, reservations=reservations)
+
+@app.route('/user/summary')
+@auth_required()
+@roles_required('user')
+def user_summary():
+    user = current_user
+    data = db.session.query(
+        ParkingLot.id,
+        ParkingLot.pl_name,
+        func.count(Reservation.id).label('times_used')
+    ).join(ParkingSpot, ParkingSpot.id == Reservation.spot_id
+    ).join(ParkingLot, ParkingLot.id == ParkingSpot.lot_id
+    ).filter(Reservation.user_id == user.id
+    ).group_by(ParkingLot.id
+    ).all()
+
+    if data:
+        data = [{"lot_id": d.id, "pl_name": d.pl_name, "times_used": d.times_used} for d in data]
+
+    duration_data = Reservation.query.filter_by(user_id = user.id).all()
+    if duration_data:
+        duration_data = [{"id": r.id, "pl_name": r.spot.lot.pl_name, "duration": r.duration, "date": r.parking_timestamp.strftime('%d-%m-%Y')} for r in duration_data]
+    
+    return render_template('user_summary.html', user=user, data=data, duration_data=duration_data)
 
 
 @app.route('/user/book_spot/<int:lot_id>')

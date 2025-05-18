@@ -1,0 +1,39 @@
+{% extends "user_dashboard.html" %}
+
+{% block title %}User Summary{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="rounded border my-5 p-4 bg-light shadow-sm">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-sm-12">
+                <h5 class="mb-4 text-center">Reservation with duration</h5>
+                <table class="table table-hover table-striped align-middle">
+                    <thead class="table-dard">
+                        <tr>
+                            <th>Reservation ID</th>
+                            <th>Date</th>
+                            <th>Prime Location Name</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in duration_data %}
+                        <tr>
+                            <td>{{d.id}}</td>
+                            <td>{{d.date}}</td>
+                            <td>{{d.pl_name}}</td>
+                            <td>{{d.duration}}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3">No Duration Data Availabe</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
