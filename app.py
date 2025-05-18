@@ -2,6 +2,7 @@ from flask import Flask
 from flask_security import SQLAlchemyUserDatastore, Security, hash_password
 
 from config import LocalDevelopmentConfig
+from application.resources import api
 from application.database import db
 from application.models import User, Role, UserRoles
 
@@ -10,6 +11,7 @@ def create_app():
     app.config.from_object(LocalDevelopmentConfig)
 
     db.init_app(app)
+    api.init_app(app)
 
     datastore = SQLAlchemyUserDatastore(db, User, Role)
     app.security = Security(app, datastore)

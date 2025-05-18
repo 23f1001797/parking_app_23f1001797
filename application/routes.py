@@ -1,4 +1,4 @@
-from flask import current_app as app, render_template, request, url_for, redirect, flash
+from flask import current_app as app, render_template, request, url_for, redirect, flash, jsonify
 from flask_security import current_user, roles_accepted, roles_required, auth_required, logout_user, login_user, hash_password, verify_password
 from sqlalchemy import func, or_
 from datetime import datetime
@@ -69,11 +69,76 @@ def user_login():
     else: 
         return render_template('security/login_user.html')
 
+@app.route('/api/user/login', methods=['GET', 'POST'])
+def api_user_login():
+    body = request.get_json()
+    email = body['email']
+    password = body['password']
+
+    if not email or not password:
+        return jsonify({"error": "please fill all the fields"}), 400
+    
+    user = app.security.datastore.find_user(email = email)
+    if user:
+        if verify_password(password, user.password):
+            login_user(user)
+            return jsonify({
+                "auth-token": user.get_auth_token()
+            }), 200
+        else:
+            return jsonify({"error": "Invalid password"}), 400
+        
+    else:
+        return jsonify({"error": "user not found"}), 404
+
 @app.route('/user_logout')
 @auth_required()
 def user_logout():
     logout_user()
     return redirect(url_for('user_login'))
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+@auth_required()
+@roles_accepted('admin', 'user')
+def profile():
+    user = current_user
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not username or not email:
+            flash('username or email cannot be empty', 'danger')
+            return redirect(url_for('profile'))
+        
+        if not password and not confirm_password:
+            user.username = username
+            user.email = email
+            db.session.commit()
+            flash('profile updated successfully', 'success')
+            return redirect(url_for('profile'))
+        
+        if not password or not confirm_password:
+            flash('please fill both password fields', 'danger')
+            return redirect(url_for('profile'))
+        
+        if username and email and password and confirm_password:
+            if password != confirm_password:
+                flash("passwords do not match", 'danger')
+                return redirect(url_for('profile'))
+
+            user.password = hash_password(password)
+            user.email = email
+            user.username = username
+            db.session.commit()
+            flash('profile updated successfully', 'success')
+            return redirect(url_for('profile'))
+    if 'admin' in roles_list(user.roles):
+        return render_template('admin_profile.html', user=user)
+    else:
+        return render_template('user_profile.html', user=user)
 
 ####################################################################################
 
