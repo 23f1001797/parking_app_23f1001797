@@ -15,6 +15,7 @@
                             <th>Date</th>
                             <th>Prime Location Name</th>
                             <th>Duration</th>
+                            <th>Cost</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -24,6 +25,7 @@
                             <td>{{d.date}}</td>
                             <td>{{d.pl_name}}</td>
                             <td>{{d.duration}}</td>
+                            <td>{{d.cost}}</td>
                         </tr>
                         {% else %}
                         <tr>
@@ -35,5 +37,70 @@
             </div>
         </div>
     </div>
+
+    <div class="my-5 p-4 border rounded shadow-sm bg-light">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-sm-12 text-center">
+                <h5 class="mb-4">Your Parking Summary</h5>
+                <div class="bg-light p-3 rounded shadow-sm">
+                    <canvas id="summaryChart" style="max-width: 100%; height: auto;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+    const data = JSON.parse('{{data | tojson | safe }}') || [];
+    const labels = data.map(item => item.pl_name || "Unknown");
+    const count = data.map(item => item.times_used || 0);
+
+    if (labels.length > 0) {
+        new Chart(document.getElementById('summaryChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Total Visits per Parking Lot",
+                    data: count,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: tooltipItem => `Count: ${tooltipItem.raw}`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            stepSize: 1,
+                            callback: value => Math.round(value)
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        document.getElementById('summaryChart').parentNode.innerHTML = "<p class='text-center'> No data available.</p>";
+    }
+</script>
 {% endblock %}

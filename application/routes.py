@@ -379,7 +379,7 @@ def user_summary():
 
     duration_data = Reservation.query.filter_by(user_id = user.id).all()
     if duration_data:
-        duration_data = [{"id": r.id, "pl_name": r.spot.lot.pl_name, "duration": r.duration, "date": r.parking_timestamp.strftime('%d-%m-%Y')} for r in duration_data]
+        duration_data = [{"id": r.id, "pl_name": r.spot.lot.pl_name, "duration": r.duration, "date": r.parking_timestamp.strftime('%d-%m-%Y'), "cost": r.parking_cost} for r in duration_data]
     
     return render_template('user_summary.html', user=user, data=data, duration_data=duration_data)
 
