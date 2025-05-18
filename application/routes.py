@@ -117,6 +117,68 @@ def admin_summary():
         })
     return render_template('admin_summary.html', revenue=revenue, lot_availability=lot_availability)
 
+@app.route('/admin/search', methods=['GET', 'POST'])
+@auth_required()
+@roles_required('admin')
+def admin_search():
+    if request.method == 'POST':
+        user_result = None
+        lot_result = None
+        spot_result = None
+        reservation_result = None
+
+        table = request.form.get('table')
+        search_query = request.form.get('search_query')
+        if not search_query or not table:
+            flash('table is not selected or search box is empty', 'danger')
+            return redirect(url_for('admin_search'))
+        
+        if table == "users":
+            user_result = User.query.filter(
+                db.or_(
+                    User.username.ilike(f"%{search_query}%"),
+                    User.email.ilike(f"%{search_query}%"),
+                    User.active.ilike(f"%{search_query}%"),
+                    db.cast(User.id, db.String).ilike(f"%{search_query}%")
+                )
+            ).all()
+        elif table == "parkingLot":
+            lot_result = ParkingLot.query.filter(
+                db.or_(
+                    ParkingLot.pl_name.ilike(f"%{search_query}"),
+                    ParkingLot.address.ilike(f"%{search_query}"),
+                    db.cast(ParkingLot.id, db.String).ilike(f"%{search_query}%"),
+                    db.cast(ParkingLot.price, db.String).ilike(f"%{search_query}%"),
+                    db.cast(ParkingLot.pincode, db.String).ilike(f"%{search_query}%")
+                )
+            ).all()
+
+        elif table == "parkingSpot":
+            spot_result = ParkingSpot.query.filter(
+                db.or_(
+                    ParkingSpot.status.ilike(f"%{search_query}%"),
+                    db.cast(ParkingSpot.id, db.String).ilike(f"%{search_query}%"),
+                    db.cast(ParkingSpot.lot_id, db.String).ilike(f"%{search_query}%"),
+                )
+            ).all()
+        
+        elif table == "reservations":
+            reservation_result = Reservation.query.filter(
+                db.or_(
+                    Reservation.status.ilike(f"%{search_query}%"),
+                    db.cast(Reservation.id, db.String).ilike(f"%{search_query}%"),
+                    db.cast(Reservation.user_id, db.String).ilike(f"%{search_query}%"),
+                    db.cast(Reservation.spot_id, db.String).ilike(f"%{search_query}%"),
+                )
+            ).all()
+        
+        return render_template('admin_search.html', table=table, search_query=search_query
+                                                    , Reservations = reservation_result
+                                                    , Users = user_result
+                                                    , ParkingLots = lot_result
+                                                    , ParkingSpots = spot_result)
+    return render_template('admin_search.html')
+
 @app.route('/admin/users')
 @auth_required()
 @roles_required('admin')

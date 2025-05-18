@@ -13,7 +13,7 @@
 
 ### recommended
 
-8 - Milestone-VP Search-Implemented
+8 - Milestone-VP Search-Implemented ✅
 9 - Milestone-VP Created-API
 10 - Milestone-VP Charts
 11 - Milestone-VP Validation
