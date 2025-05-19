@@ -7,7 +7,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String, unique = True, nullable = False)
     password = db.Column(db.String, nullable = False)
     fs_uniquifier = db.Column(db.String, unique= True, nullable = False)
-    active = db.Column(db.Boolean, default = True)
+    active = db.Column(db.Boolean, default = True, nullable = False)
     roles = db.relationship('Role', secondary = 'user_roles', backref = 'bearer')
     reservations = db.relationship('Reservation', backref = 'bearer')
 
@@ -45,6 +45,6 @@ class Reservation(db.Model):
     vrn = db.Column(db.String, nullable = False)
     parking_timestamp = db.Column(db.DateTime, nullable = False)
     leaving_timestamp = db.Column(db.DateTime, nullable = True)
-    duration = db.Column(db.String, nullable = True)
+    duration = db.Column(db.Integer, nullable = True)
     status = db.Column(db.String, nullable = False, default = 'unpaid')
     parking_cost = db.Column(db.Integer, nullable = False, default = 0)
