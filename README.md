@@ -4,7 +4,7 @@
 ## To run the code, simply clone it in your machine and follow the below steps:-
 
 1. Create environment-
-<code> python3 -m venv venv </code>
+<li><code> python3 -m venv venv </code></li>
 
 2. activate it - 
 for windows- <code> venv\Scripts\activate </code>
