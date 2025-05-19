@@ -1,22 +1,17 @@
 # This is MAD-I project application vehicle parking management system.
 
 
-### Milestones to commit during coding:-
+## To run the code, simply clone it in your machine and follow the below steps:-
 
-1 - Milestone-0 VP-MAD-1 ✅
-2 - Milestone-VP DB-Relationship ✅
-3 - Milestone-VP Auth-RBAC ✅
-4 - Milestone-VP Admin-Dashboard-Management ✅
-5 - Milestone-VP User-Dashboard-Management ✅
-6 - Milestone-VP Summary-Users-Admin ✅
-7 - Milestone-VP Cost-Calculation
+1. Create environment-
+<code> python3 -m venv venv </code>
 
-### recommended
+2. activate it - 
+for windows- <code> venv\Scripts\activate </code>
+for linux/mac- <code> . venv/bin/activate </code>
 
-8 - Milestone-VP Search-Implemented ✅
-9 - Milestone-VP Created-API ✅
-10 - Milestone-VP Charts ✅
-11 - Milestone-VP Validation
-12 - Milestone-VP Responsive-UI
-13 - Milestone-VP Flask-Integration ✅
-14 - Milestone-VP Final-Submission
+3. install requirements.txt-
+<code> pip install -r requirements.txt </code>
+
+4. run the app - 
+<code> python3 app.py </code>
