@@ -81,7 +81,8 @@
                         <td>{{lot.capacity}}</td>
                         <td>{{lot.spots_count}}</td>
                         <td>
-                            <a href="{{url_for('view_parking_lot', lot_id=lot.id)}}" class="btn btn-sm btn infor"></a>
+                            <a href="{{url_for('view_parking_lot', lot_id=lot.id)}}"
+                                class="btn btn-sm btn-info">View</a>
                         </td>
                     </tr>
                     {% else %}
@@ -170,13 +171,13 @@
                             <span class="badge text-bg-danger">Unpaid</span>
                         </td>
                         <td>
-                            <a href="{{url_for('get_spot', spot_id=r.spot_id)}}" class="btn btn-sm btn-info"></a>
+                            <a href="{{url_for('get_spot', spot_id=r.spot_id)}}" class="btn btn-sm btn-info">View</a>
                         </td>
                         {% else %}
                         <td>
                             <span class="badge text-bg-success">Paid</span>
                         </td>
-                        <td></td>
+                        <td>----</td>
                         {% endif %}
                     </tr>
                     {% else %}

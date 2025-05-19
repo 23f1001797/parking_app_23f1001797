@@ -31,7 +31,7 @@
                     readonly>
             </div>
             <div class="text-center">
-                <a href="{{url_for('admin_dashboard')}}" class="btn btn-outline-secondary">Close</a>
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">Close</a>
             </div>
         </div>
 
@@ -49,7 +49,7 @@
                 </div>
                 <div class="d-flex justify-content-between">
                     <a href="{{url_for('delete_spot', spot_id=spot.id)}}" class="btn btn-danger">Delete</a>
-                    <a href="{{url_for('admin_dashboard')}}" class="btn btn-outline-secondary">Close</a>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary">Close</a>
                 </div>
             </div>
         </div>

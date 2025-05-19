@@ -46,17 +46,18 @@
                 <div class="col-md-6">
                     <label for="duration" class="form-label fw-semibold">Duration</label>
                     <input type="text" class="form-control" id="duration" name="duration"
-                        value="{{' %02d : %02d ' %(reservation.duration_hr, reservation.duration_min)}}">
+                        value="{{' %02d hr : %02d min ' %(reservation.duration_hr, reservation.duration_min)}}"
+                        readonly>
                 </div>
                 <div class="col-md-6">
                     <label for="totalcost" class="form-label fw-semibold">Total Cost</label>
                     <input type="text" class="form-control" id="totalcost" name="totalcost"
-                        value="{{reservation.total_cost}}" readonly>
+                        value="₹{{reservation.total_cost}}" readonly>
                 </div>
             </div>
             <div class="d-flex justify-content-between">
                 <a href="{{url_for('release_spot', reserve_id = reservation.id)}}" class="btn btn-success">Release</a>
-                <a href="{{url_for('user_dashboard')}}" class="btn btn-outline-secondary">Cancel</a>
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </div>
     </div>
