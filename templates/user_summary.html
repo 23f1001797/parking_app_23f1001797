@@ -6,14 +6,17 @@
 <div class="container">
     <div class="rounded border my-5 p-4 bg-light shadow-sm">
         <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10 col-sm-12">
-                <h5 class="mb-4 text-center">Reservation with duration</h5>
+            <div class="col-md-10 col-sm-12">
+                <h5 class="mb-4 text-center">Reservation Summary</h5>
                 <table class="table table-hover table-striped align-middle">
                     <thead class="table-dard">
                         <tr>
-                            <th>Reservation ID</th>
+                            <th>Sr. No.</th>
                             <th>Date</th>
                             <th>Prime Location Name</th>
+                            <th>Address</th>
+                            <th>Parking Time</th>
+                            <th>Leaving Time</th>
                             <th>Duration</th>
                             <th>Cost</th>
                         </tr>
@@ -21,10 +24,13 @@
                     <tbody>
                         {% for d in duration_data %}
                         <tr>
-                            <td>{{d.id}}</td>
+                            <td>{{loop.index}}</td>
                             <td>{{d.date}}</td>
                             <td>{{d.pl_name}}</td>
-                            <td>{{d.duration}}</td>
+                            <td>{{d.address}}, {{d.pincode}}</td>
+                            <td>{{d.parking_timestamp.strftime('%H:%M:%S')}}</td>
+                            <td>{{d.leaving_timestamp.strftime('%H:%M:%S')}}</td>
+                            <td>{{d.duration | int // 60}}h : {{d.duration | int % 60}}m</td>
                             <td>{{d.cost}}</td>
                         </tr>
                         {% else %}
@@ -65,16 +71,10 @@
                     label: "Total Visits per Parking Lot",
                     data: count,
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(54, 162, 235, 0.2)'
                     ],
                     borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)'
                     ],
                     borderWidth: 1
                 }]

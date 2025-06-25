@@ -66,11 +66,11 @@
                 <table class="table table-bordered table-hover table-striped align-middle text-center">
                     <thead class="table-primary">
                         <tr>
-                            <th>ID</th>
+                            <th>Sr. No.</th>
+                            <th>Lot ID</th>
                             <th>Prime Location Name</th>
                             <th>Address</th>
-                            <th>Pincode</th>
-                            <th>Available</th>
+                            <th>Available Spots</th>
                             <th>Price/hr</th>
                             <th>Actions</th>
                         </tr>
@@ -79,10 +79,10 @@
                     <tbody>
                         {% for l in parkingLots %}
                         <tr>
+                            <td>{{loop.index}}</td>
                             <td>{{l.lot_id}}</td>
                             <td>{{l.pl_name}}</td>
-                            <td>{{l.address}}</td>
-                            <td>{{l.pincode}}</td>
+                            <td>{{l.address}}, {{l.pincode}}</td>
                             <td>{{l.availability}}</td>
                             <td> ₹{{l.price}}</td>
                             <td>
@@ -119,32 +119,25 @@
             <table class="table table-bordered table-hover table-striped align-middle text-center">
                 <thead class="table-primary">
                     <tr>
-                        <th>ID</th>
+                        <th>Sr. No.</th>
                         <th>Lot ID</th>
                         <th>Spot ID</th>
                         <th>Location</th>
                         <th>Vehicle No.</th>
                         <th>Parking Timestamp</th>
-                        <th>Leaving Timestamp</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in reservations %}
+                    {% if not r.leaving_timestamp %}
                     <tr>
-                        <td>{{r.id}}</td>
+                        <td>{{loop.index}}</td>
                         <td>{{r.spot.lot_id}}</td>
                         <td>{{r.spot_id}}</td>
                         <td>{{r.spot.lot.address}}</td>
                         <td>{{r.vrn}}</td>
                         <td>{{r.parking_timestamp.strftime('%Y-%m-%d | %H : %M')}}</td>
-                        <td>
-                            {% if r.leaving_timestamp %}
-                            {{r.leaving_timestamp.strftime('%Y-%m-%d | %H : %M')}}
-                            {% else %}
-                            not released yet
-                            {% endif %}
-                        </td>
                         <td>
                             {% if r.status == 'unpaid' %}
                             <a href="{{url_for('get_reservation', reserve_id=r.id)}}"
@@ -154,6 +147,7 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>

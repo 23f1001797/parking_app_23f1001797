@@ -193,7 +193,7 @@ def admin_search():
         reservation_result = None
 
         table = request.form.get('table')
-        search_query = request.form.get('search_query')
+        search_query = request.form.get('search_query').strip().lower()
         if not search_query or not table:
             flash('table is not selected or search box is empty', 'danger')
             return redirect(url_for('admin_search'))
@@ -405,7 +405,7 @@ def user_dashboard():
 def user_search():
     user = current_user
     reservations = Reservation.query.filter_by(user_id=user.id).all()
-    search_query = request.form.get('search_query')
+    search_query = request.form.get('search_query').strip().lower()
     if not search_query:
         flash('please enter a search query', 'danger')
         redirect(url_for('user_search'))
@@ -420,7 +420,13 @@ def user_search():
         )
     ).all()
     if results:
-        results = [{"lot_id": r.id, "pl_name": r.pl_name, "address": r.address, "price": r.price, "pincode": r.pincode, "availability": r.spots_count - get_reserved_spots_count(r.id)} for r in results]
+        results = [{
+            "lot_id": r.id, 
+            "pl_name": r.pl_name, 
+            "address": r.address, 
+            "price": r.price, 
+            "pincode": r.pincode, 
+            "availability": r.spots_count - get_reserved_spots_count(r.id)} for r in results]
 
     return render_template('user_dashboard.html', parkingLots=results, search_query=search_query, reservations=reservations)
 
@@ -444,7 +450,16 @@ def user_summary():
 
     duration_data = Reservation.query.filter_by(user_id = user.id).all()
     if duration_data:
-        duration_data = [{"id": r.id, "pl_name": r.spot.lot.pl_name, "duration": r.duration, "date": r.parking_timestamp.strftime('%d-%m-%Y'), "cost": r.parking_cost} for r in duration_data]
+        duration_data = [{
+            "id": r.id, 
+            "pl_name": r.spot.lot.pl_name, 
+            "parking_timestamp": r.parking_timestamp, 
+            "leaving_timestamp": r.leaving_timestamp, 
+            "duration": r.duration, 
+            "date": r.parking_timestamp.strftime('%d-%m-%Y'), 
+            "address": r.spot.lot.address, 
+            "pincode" : r.spot.lot.pincode, 
+            "cost": r.parking_cost} for r in duration_data if r.duration is not None]
     
     return render_template('user_summary.html', user=user, data=data, duration_data=duration_data)
 
