@@ -210,8 +210,8 @@ def admin_search():
         elif table == "parkingLot":
             lot_result = ParkingLot.query.filter(
                 db.or_(
-                    ParkingLot.pl_name.ilike(f"%{search_query}"),
-                    ParkingLot.address.ilike(f"%{search_query}"),
+                    ParkingLot.pl_name.ilike(f"%{search_query}%"),
+                    ParkingLot.address.ilike(f"%{search_query}%"),
                     db.cast(ParkingLot.id, db.String).ilike(f"%{search_query}%"),
                     db.cast(ParkingLot.price, db.String).ilike(f"%{search_query}%"),
                     db.cast(ParkingLot.pincode, db.String).ilike(f"%{search_query}%")
@@ -414,9 +414,9 @@ def user_search():
         db.or_(
             ParkingLot.pl_name.ilike(f"%{search_query}%"),
             ParkingLot.address.ilike(f"%{search_query}%"),
-            db.cast(ParkingLot.id, db.String).ilike(f"{search_query}"),
-            db.cast(ParkingLot.price, db.String).ilike(f"{search_query}"),
-            db.cast(ParkingLot.pincode, db.String).ilike(f"{search_query}"),
+            db.cast(ParkingLot.id, db.String).ilike(f"%{search_query}%"),
+            db.cast(ParkingLot.price, db.String).ilike(f"%{search_query}%"),
+            db.cast(ParkingLot.pincode, db.String).ilike(f"%{search_query}%"),
         )
     ).all()
     if results:
